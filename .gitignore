@@ -1,2 +1,3 @@
-backend/node_modules/
-frontend/node_modules/
+menu-service/node_modules/
+client/node_modules/
+gateway-service/node_modules
