@@ -1,7 +1,7 @@
 import express from 'express'
 import 'dotenv/config'
 import { connectDB } from "./db/connect.js"
-import menuRoutes from './routes/menuRoutes.js'
+import { menuRoutes } from './routes/menuRoutes.js'
 
 connectDB();
 const app = express();

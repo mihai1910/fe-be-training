@@ -8,13 +8,13 @@ const PORT = process.env.PORT;
 const menuURL = process.env.MENU_SERVICE_URL;
 const authURL = process.env.AUTH_SERVICE_URL;
 
-app.use(createProxyMiddleware({
+app.use('/api/menu', createProxyMiddleware({
     target: menuURL,
     changeOrigin: true,
     pathRewrite: {'^/api/menu': '' },
 }))
 
-app.use(createProxyMiddleware({
+app.use('/api/auth', createProxyMiddleware({
     target:authURL,
     changeOrigin: true,
     pathRewrite: { '^/api/auth': ''}

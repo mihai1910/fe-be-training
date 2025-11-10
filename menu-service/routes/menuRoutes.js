@@ -1,7 +1,8 @@
 import express from 'express'
-import { MenuItem } from './db/MenuItem.js'
+import { MenuItem } from '../db/MenuItem.js'
 
-const router = express.Router();
+export const menuRoutes = () => {
+   const router = express.Router();
 
 router.get('/', async (req, res, next) =>{
     try{
@@ -58,4 +59,5 @@ router.delete('/:id', async (req, res, next) => {
 router.use((err, req, res, next) => {
     console.log(err.message)
     res.status(err.status || 500).json({message: err.message})
-})
+}) 
+}
