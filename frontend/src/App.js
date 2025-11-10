@@ -4,7 +4,7 @@ import { useState } from 'react';
 export default function App() {
   const [menuItems, setMenuItems] = useState([]);
 
-  const getMenu = () => {
+  const getMenu = async () => {
     axios.get('/menu')
     .then(res => {
       console.log(res.status)
@@ -12,8 +12,8 @@ export default function App() {
     })
   }
   
-  const postMenuItem = () => {
-    const newItem = {name:"Salt Fish"};
+  const postMenuItem = async () => {
+    const newItem = {name:"Salt Fish", category: "Fish", price: 21.50};
     axios.post('/menu', newItem)
     .then(res =>{
       console.log(res.status);
@@ -21,35 +21,38 @@ export default function App() {
     })
   }
 
-  const putMenuItem = () => {
-    const targetID = 2;
-    const newItemName = {name: "Pumpkin Pie"};
-    axios.put(`/menu/${targetID}`, newItemName)
-    .then(res => {
-      console.log(res.status);
-      setMenuItems(res.data);
+const putMenuItem = async () => {
+  const updatedItem = {id: menuItems[1]._id, name: "Pumpkin Pie", category: "Dessert", price:12.50}
+  axios.put(`/menu/${updatedItem._id}`, updatedItem)
+  .then(() => {
+    setMenuItems(prev => {
+      prev.map(i => i._id === updatedItem._id ? updatedItem : i)
     })
-  }
+  })
+  .then (() => getMenu());
+}
 
-  const deleteMenuItem = () => {
-    axios.delete('/menu/2')
-    .then(res => {
-      console.log(res.status);
-      setMenuItems(menuItems.filter(item => item.id !== res.data.id));
-    })
-  }
+const deleteMenuItem = async () => {
+  const targetID = menuItems[0]._id;
+  axios.delete(`/menu/${targetID}`)
+  .then(res => {
+    const updatedList = menuItems.filter(item => item._id !== targetID);
+    setMenuItems(updatedList);
+  })
+  .then (() => getMenu());
+}
 
   return(
     <>
     <button onClick={getMenu}>Get Menu Items</button>
     <button onClick={postMenuItem}>Post an item to the menu</button>
     <button onClick={putMenuItem}>Change the second item to pumpkin pie</button>
-    <button onClick={deleteMenuItem}>Delete the first item</button>
+    <button onClick={deleteMenuItem}>Delete the second item</button>
 
     {menuItems.map((item) => {
       return(
-        <h1 key={item.id}>
-          {item.id}: {item.name}
+        <h1 key={item._id}>
+          {item._id.slice(-5)}: {item.name}
         </h1>
       )
     })}

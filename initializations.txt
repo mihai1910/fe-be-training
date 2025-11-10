@@ -1,0 +1,43 @@
+MONGO_URI=mongodb://localhost:27017/littlelemon
+
+import mongoose from "mongoose";
+import 'dotenv/config';
+
+export async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+    process.exit(1);
+  }
+}
+
+==================================================================================
+
+PG_USER=postgres
+PG_HOST=localhost
+PG_DB=restaurant
+PG_PASS=yourpassword
+PG_PORT=5432
+
+import pkg from 'pg';
+import 'dotenv/config';
+
+const { Pool } = pkg;
+
+export const pool = new Pool({
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DB,
+  password: process.env.PG_PASS,
+  port: process.env.PG_PORT
+});
+
+pool.on('connect', () => {
+  console.log('Connected to PostgreSQL');
+});
+
+pool.on('error', (err) => {
+  console.error('PostgreSQL connection error:', err.message);
+});
