@@ -5,7 +5,7 @@ export default function App() {
   const [menuItems, setMenuItems] = useState([]);
 
   const getMenu = async () => {
-    axios.get('/menu')
+    axios.get('/api/menu')
     .then(res => {
       console.log(res.status)
       setMenuItems(res.data)
@@ -14,7 +14,7 @@ export default function App() {
   
   const postMenuItem = async () => {
     const newItem = {name:"Salt Fish", category: "Fish", price: 21.50};
-    axios.post('/menu', newItem)
+    axios.post('/api/menu', newItem)
     .then(res =>{
       console.log(res.status);
       setMenuItems([...menuItems, res.data]);
@@ -23,7 +23,7 @@ export default function App() {
 
 const putMenuItem = async () => {
   const updatedItem = {id: menuItems[1]._id, name: "Pumpkin Pie", category: "Dessert", price:12.50}
-  axios.put(`/menu/${updatedItem._id}`, updatedItem)
+  axios.put(`/api/menu/${updatedItem._id}`, updatedItem)
   .then(() => {
     setMenuItems(prev => {
       prev.map(i => i._id === updatedItem._id ? updatedItem : i)
@@ -34,7 +34,7 @@ const putMenuItem = async () => {
 
 const deleteMenuItem = async () => {
   const targetID = menuItems[0]._id;
-  axios.delete(`/menu/${targetID}`)
+  axios.delete(`/api/menu/${targetID}`)
   .then(res => {
     const updatedList = menuItems.filter(item => item._id !== targetID);
     setMenuItems(updatedList);

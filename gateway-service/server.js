@@ -6,6 +6,7 @@ const app = express();
 app.use(express.json());
 const PORT = process.env.PORT;
 const menuURL = process.env.MENU_SERVICE_URL;
+console.log(menuURL)
 const authURL = process.env.AUTH_SERVICE_URL;
 
 app.use('/api/menu', createProxyMiddleware({
