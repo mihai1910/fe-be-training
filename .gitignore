@@ -1,3 +1,4 @@
 menu-service/node_modules/
 client/node_modules/
-gateway-service/node_modules
+gateway-service/node_modules/
+auth-service/node_modules/

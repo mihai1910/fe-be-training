@@ -1,16 +1,15 @@
-import express from 'express'
-import 'dotenv/config'
-import { connectDB } from "./db/connect.js"
-import { menuRoutes } from './routes/menuRoutes.js'
+import express from 'express';
+import 'dotenv/config';
+import { connectDB } from './db/connect.js';
+import { menuRoutes } from './routes/menuRoutes.js';
 
-connectDB();
 const app = express();
-const PORT = process.env.PORT;
+app.use(express.json());
 
-app.use('/api/menu', menuRoutes)
+app.use('/', menuRoutes);
 
-app.listen(PORT, (err) => {
-    if(err)
-        return new Error(500, "Server issue");
-    console.log(`Menu service is running on port ${PORT}`)
-})
+const PORT = process.env.PORT || 5002;
+app.listen(PORT, '0.0.0.0', async () => {
+  await connectDB().catch((err) => console.error(err));
+  console.log(`Menu service running on http://localhost:${PORT}`);
+});
