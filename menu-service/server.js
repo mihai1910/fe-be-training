@@ -9,7 +9,7 @@ app.use(express.json());
 app.use('/', menuRoutes);
 
 const PORT = process.env.PORT || 5002;
-app.listen(PORT, '0.0.0.0', async () => {
+app.listen(PORT, async () => {
   await connectDB().catch((err) => console.error(err));
   console.log(`Menu service running on http://localhost:${PORT}`);
 });
