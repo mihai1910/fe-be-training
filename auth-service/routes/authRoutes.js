@@ -30,7 +30,6 @@ try{
                 username: username,
                 email:email,
                 password:hashedPassword,
-
             }
         })
     })
