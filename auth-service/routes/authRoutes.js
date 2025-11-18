@@ -8,18 +8,15 @@ import { authenticate } from '../middleware/authMiddleware.js'
 
 const auth = express.Router();
 
-auth.get('/me', authenticate, (req, res) => {
-    return res.status(200).json({
-    message: "OK",
-    user: req.user
-  })
+auth.get('/me', (req, res) => {
+    return res.status(200).json({ message: "OK", user: req.user })
 })
 
 auth.post('/register', async (req, res, next) => {
     try{
     const { username, email, password } = req.body;
     if(!username || !email || !password)
-        return res.status(400).json({message:"please fill all required fields"});
+        return res.status(400).json({message:"Please fill all required fields"});
     const exists = await prisma.user.findFirst({
         where: {
             OR: [
@@ -30,7 +27,7 @@ auth.post('/register', async (req, res, next) => {
     });
 
     if(exists !== null) 
-        return res.status(400).json({message:"email or username already in use"})
+        return res.status(400).json({message:"Email or username already in use"})
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -41,7 +38,7 @@ auth.post('/register', async (req, res, next) => {
             password:hashedPassword,
         }
     })
-    return res.status(200).json({message: "success", item: createItem})
+    return res.status(200).json({message: "Success", item: createItem})
 }catch(err){
     next(err);
 }})
@@ -63,7 +60,7 @@ auth.post('/login', async (req, res, next) => {
         
         const isValid = await bcrypt.compare(password, exists.password);
         if(!isValid)
-            return res.status(400).json({message: "password is incorrect"})
+            return res.status(400).json({message: "Password is incorrect"})
         const refreshToken = crypto.randomBytes(40).toString("hex");
         const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000 )
         await prisma.refreshToken.create({
@@ -93,20 +90,20 @@ auth.post('/refresh', async (req, res, next) => {
         if ( storedToken === null )
             return res.status(400).json({ message: "Refresh token doesn't exist" })
 
-        if ( storedToken.expiresAt < Date.now() )
+        if ( storedToken.expiresAt < new Date() )
             return res.status(400).json({ message: "Refresh token expired" })
 
         const user = await prisma.user.findUnique({
             where: { id: storedToken.userID }
         })
 
-        const newAccessToken = jwt.sign( {id: user.id, email: user.email}, process.env.JWT_SECRET, {expiresIn: "2h"} )
-        prisma.refreshToken.delete({
+        const newAccessToken = jwt.sign( { id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "2h" } )
+        await prisma.refreshToken.delete({
             where: { token: refreshToken },
         })
 
         const newRefreshToken = crypto.randomBytes(40).toString("hex");
-        const newExpiresAt = Date.now() + 14 * 24 * 60 * 60 * 1000;
+        const newExpiresAt = new Date( Date.now() + 14 * 24 * 60 * 60 * 1000 );
 
         await prisma.refreshToken.create({
             data:{

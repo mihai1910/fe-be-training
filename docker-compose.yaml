@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: auth-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: psql
+      POSTGRES_DB: authdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    env_file:
+      - ./auth-service/.env
+    environment:
+      DATABASE_URL: "postgresql://postgres:psql@db:5432/authdb?schema=public"
+      PORT: 5001
+    depends_on:
+      - db
+    ports:
+      - "5001:5001"
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    env_file:
+      - ./gateway-service/.env
+    environment:
+      PORT: 5000
+      AUTH_SERVICE_URL: "http://auth-service:5001"
+      JWT_SECRET: "same-secret-as-in-auth-service"
+    depends_on:
+      - auth-service
+    ports:
+      - "5000:5000"
+
+volumes:
+  auth_db_data:

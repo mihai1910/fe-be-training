@@ -7,8 +7,6 @@ RUN npm ci --omit=dev
 
 COPY . .
 
-RUN npx prisma generate
-
-EXPOSE 5001
+EXPOSE 5000
 
 CMD ["node", "server.js"]
