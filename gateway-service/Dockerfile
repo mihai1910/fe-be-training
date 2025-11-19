@@ -4,9 +4,10 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 RUN npm ci --omit=dev
+RUN npm install -g nodemon
 
 COPY . .
 
 EXPOSE 5000
 
-CMD ["node", "server.js"]
+CMD ["npm", "run", "dev"]

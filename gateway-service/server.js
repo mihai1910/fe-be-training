@@ -50,7 +50,12 @@ app.use(
     target: process.env.AUTH_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: { "^/api/auth": "" },
-  }))
+
+    onProxyReq: (proxyReq, req) => {
+      if (req.headers.authorization) {
+        proxyReq.setHeader("Authorization", req.headers.authorization);
+      }}}));
+
 
 app.use('/api/tasks', 
   createProxyMiddleware({

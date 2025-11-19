@@ -9,10 +9,10 @@ import { authenticate } from '../middleware/authMiddleware.js'
 const auth = express.Router();
 
 auth.get('/me', (req, res) => {
-    return res.status(200).json({ message: "OK", user: req.user })
+    return res.status(200).json({ message: "OK", user: req.body })
 })
 
-auth.post('/register', async (req, res, next) => {
+auth.post('/register', authenticate, async (req, res, next) => {
     try{
     const { username, email, password } = req.body;
     if(!username || !email || !password)
@@ -43,7 +43,7 @@ auth.post('/register', async (req, res, next) => {
     next(err);
 }})
 
-auth.post('/login', async (req, res, next) => {
+auth.post('/login', authenticate, async (req, res, next) => {
     try{
         const { username, email, password } = req.body;
         const exists = await prisma.user.findFirst({
@@ -76,7 +76,7 @@ auth.post('/login', async (req, res, next) => {
     next(err);
 }})
 
-auth.post('/refresh', async (req, res, next) => {
+auth.post('/refresh', authenticate, async (req, res, next) => {
     try{
         const { refreshToken } = req.body;
 
