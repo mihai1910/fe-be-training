@@ -1,0 +1,64 @@
+name: Deploy Gateway Service
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  ECR_REPOSITORY: gateway-service
+  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+  ECS_SERVICE: gateway-service
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js (for tests)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          cd gateway-service
+          npm ci
+
+      - name: Run tests
+        run: |
+          cd gateway-service
+          npm test
+
+      - name: Configure AWS Credentials
+        if: success()   # only run if tests PASSED
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        if: success()
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push docker image
+        if: success()
+        run: |
+          docker build -t $ECR_REPOSITORY ./gateway-service
+          docker tag $ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Deploy to ECS
+        if: success()
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          # hashFiles: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          wait-for-service-stability: true
+          task-definition: gateway-service-td
